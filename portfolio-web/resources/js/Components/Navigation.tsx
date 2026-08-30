@@ -1,16 +1,17 @@
-import { Link } from '@inertiajs/react';
-import { ArrowRight, Menu, X } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { ArrowUpRight, Menu, X, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
-    { label: 'Home', href: '#home' },
-    { label: 'About', href: '#about' },
-    { label: 'Skills', href: '#skills' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Home', href: '/' },
+    { label: 'Projects', href: '/projects' },
+    { label: 'Experience', href: '/experience' },
+    { label: 'Certificates', href: '/certificates' },
+    { label: 'Contact', href: '/contact' },
 ];
 
 export default function Navigation() {
+    const { url } = usePage();
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -20,7 +21,6 @@ export default function Navigation() {
         };
 
         handleScroll();
-
         window.addEventListener('scroll', handleScroll);
 
         return () => {
@@ -28,93 +28,133 @@ export default function Navigation() {
         };
     }, []);
 
+    // Helper to match path accurately for root vs routes
+    const isActiveRoute = (path: string) => {
+        if (path === '/') return url === '/';
+        return url.startsWith(path);
+    };
+
     return (
         <header
-            className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
                 isScrolled
-                    ? 'border-b border-slate-200/80 bg-[#f4f2ed]/90 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-[#22242f]/90 dark:shadow-lg'
-                    : 'bg-[#f4f2ed] dark:bg-[#22242f]'
+                    ? 'py-4 bg-[#f8f9fa]/80 shadow-sm backdrop-blur-xl dark:bg-[#0d0f17]/80 dark:shadow-slate-950/40 border-b border-slate-200/50 dark:border-slate-800/50'
+                    : 'py-6 bg-transparent'
             }`}
         >
-            <nav className="mx-auto flex h-[110px] w-full max-w-[1500px] items-center justify-between px-6 md:px-10 lg:px-14 xl:px-16">
+            <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-6 md:px-10 lg:px-12">
+                {/* Brand Logo */}
                 <Link
                     href="/"
-                    className="flex shrink-0 items-center gap-3"
+                    className="group flex shrink-0 items-center gap-3.5 focus:outline-none"
                 >
-                    <div className="relative flex h-11 w-11 items-center justify-center">
-                        <div className="absolute h-8 w-6 -rotate-[30deg] rounded-[3px] bg-slate-900 dark:bg-white" />
-
-                        <div className="absolute bottom-[3px] right-[2px] h-[3px] w-6 -rotate-[30deg] rounded-full bg-slate-900 dark:bg-white" />
+                    <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-md transition-all duration-300 group-hover:scale-105 group-hover:bg-blue-600 dark:bg-white dark:text-slate-900 dark:group-hover:bg-blue-400">
+                        <span className="font-mono text-lg font-bold tracking-tighter">
+                            S
+                        </span>
+                        <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                        </span>
                     </div>
 
-                    <span className="font-serif text-[30px] tracking-[-0.03em] text-slate-900 dark:text-white">
-                        Saharsha
-                    </span>
+                    <div className="flex flex-col">
+                        <span className="font-sans text-xl font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                            Saharsha
+                        </span>
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                            Developer
+                        </span>
+                    </div>
                 </Link>
 
-                <div className="hidden items-center gap-12 lg:flex">
-                    {NAV_ITEMS.map((item) => (
-                        <a
-                            key={item.label}
-                            href={item.href}
-                            className="relative text-[16px] font-medium text-slate-600 transition-colors duration-300 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                        >
-                            {item.label}
-                        </a>
-                    ))}
+                {/* Desktop Central Glass Floating Navigation */}
+                <div className="hidden items-center rounded-full border border-slate-200/80 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-900/60 lg:flex">
+                    <ul className="flex items-center gap-1">
+                        {NAV_ITEMS.map((item) => {
+                            const active = isActiveRoute(item.href);
+
+                            return (
+                                <li key={item.label}>
+                                    <Link
+                                        href={item.href}
+                                        className={`relative rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                                            active
+                                                ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900'
+                                                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                                        }`}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                    </ul>
                 </div>
 
-                <a
-                    href="#contact"
-                    className="group hidden h-[72px] min-w-[190px] items-center justify-center gap-5 rounded-full border border-slate-400/80 px-8 text-[16px] font-medium text-slate-800 transition-all duration-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white dark:border-slate-600/70 dark:text-white dark:hover:border-white dark:hover:bg-white dark:hover:text-[#22242f] lg:flex"
-                >
-                    <span>Hire Me</span>
+                {/* Desktop Action CTA Button */}
+                <div className="hidden items-center gap-4 lg:flex">
+                    <Link
+                        href="/contact"
+                        className="group inline-flex items-center gap-2.5 rounded-full bg-slate-900 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-sm transition-all duration-300 hover:bg-blue-600 hover:shadow-md dark:bg-white dark:text-slate-900 dark:hover:bg-blue-400 dark:hover:text-slate-950"
+                    >
+                        <span>Hire Me</span>
+                        <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </Link>
+                </div>
 
-                    <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                </a>
-
+                {/* Mobile Toggle Button */}
                 <button
                     type="button"
                     onClick={() => setIsOpen((prev) => !prev)}
-                    aria-label="Toggle navigation"
-                    className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-300 text-slate-800 transition-all hover:border-slate-900 dark:border-slate-600 dark:text-white dark:hover:border-white lg:hidden"
+                    aria-label="Toggle navigation menu"
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm transition-all hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:hover:bg-slate-800 lg:hidden"
                 >
-                    {isOpen ? (
-                        <X className="h-5 w-5" />
-                    ) : (
-                        <Menu className="h-5 w-5" />
-                    )}
+                    {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
             </nav>
 
+            {/* Mobile Navigation Drawer Dropdown */}
             <div
-                className={`overflow-hidden border-t border-slate-200/80 bg-[#f4f2ed]/98 backdrop-blur-xl transition-all duration-300 dark:border-white/5 dark:bg-[#22242f]/95 lg:hidden ${
+                className={`overflow-hidden transition-all duration-300 ease-in-out lg:hidden ${
                     isOpen
-                        ? 'max-h-[520px] opacity-100'
+                        ? 'max-h-[500px] border-b border-slate-200/80 bg-white/95 opacity-100 backdrop-blur-2xl shadow-lg dark:border-slate-800/80 dark:bg-[#0d0f17]/95'
                         : 'pointer-events-none max-h-0 opacity-0'
                 }`}
             >
-                <div className="mx-auto flex max-w-[1500px] flex-col px-6 py-5 md:px-10">
-                    {NAV_ITEMS.map((item) => (
-                        <a
-                            key={item.label}
-                            href={item.href}
+                <div className="mx-auto flex max-w-[1400px] flex-col px-6 py-6 space-y-3">
+                    {NAV_ITEMS.map((item, index) => {
+                        const active = isActiveRoute(item.href);
+
+                        return (
+                            <Link
+                                key={item.label}
+                                href={item.href}
+                                onClick={() => setIsOpen(false)}
+                                className={`flex items-center justify-between rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all ${
+                                    active
+                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900/80 dark:hover:text-white'
+                                }`}
+                            >
+                                <span>{item.label}</span>
+                                <span className="font-mono text-xs opacity-50">
+                                    0{index + 1}
+                                </span>
+                            </Link>
+                        );
+                    })}
+
+                    <div className="pt-2">
+                        <Link
+                            href="/contact"
                             onClick={() => setIsOpen(false)}
-                            className="border-b border-slate-200 py-4 text-[17px] text-slate-600 transition-colors hover:text-slate-900 dark:border-white/5 dark:text-slate-400 dark:hover:text-white"
+                            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 py-4 text-sm font-semibold text-white shadow-md transition-all hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                         >
-                            {item.label}
-                        </a>
-                    ))}
-
-                    <a
-                        href="#contact"
-                        onClick={() => setIsOpen(false)}
-                        className="mt-6 flex h-[60px] items-center justify-center gap-4 rounded-full border border-slate-400 text-[16px] font-medium text-slate-800 transition-all hover:border-slate-900 hover:bg-slate-900 hover:text-white dark:border-slate-600 dark:text-white dark:hover:border-white dark:hover:bg-white dark:hover:text-[#22242f]"
-                    >
-                        <span>Hire Me</span>
-
-                        <ArrowRight className="h-5 w-5" />
-                    </a>
+                            <span>Hire Me</span>
+                            <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </header>

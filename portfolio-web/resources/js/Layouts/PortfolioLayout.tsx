@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 
 import Navigation from '@/Components/Navigation';
 import ThemeToggle from '@/Components/ThemeToggle';
+import Footer from "@/Layouts/Footer";
 
 interface PortfolioLayoutProps {
     children: ReactNode;
@@ -19,6 +20,7 @@ export default function PortfolioLayout({
             </main>
 
             <ThemeToggle />
+            <Footer />
         </div>
     );
 }

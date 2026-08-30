@@ -32,12 +32,12 @@ const SKILL_CATEGORIES: SkillCategory[] = [
         number: '01',
         title: 'Backend',
         subtitle: 'Server & application logic',
-        icon: <Server className="h-6 w-6" />,
+        icon: <Server className="h-5 w-5" />,
         skills: [
             {
                 name: 'Laravel',
                 description:
-                    'Application architecture, APIs and backend development.',
+                    'Application architecture, APIs, and backend development.',
             },
             {
                 name: 'PHP',
@@ -55,7 +55,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
         number: '02',
         title: 'Frontend',
         subtitle: 'Interfaces & interaction',
-        icon: <Code2 className="h-6 w-6" />,
+        icon: <Code2 className="h-5 w-5" />,
         skills: [
             {
                 name: 'React',
@@ -78,7 +78,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
         number: '03',
         title: 'Database',
         subtitle: 'Data & relationships',
-        icon: <Database className="h-6 w-6" />,
+        icon: <Database className="h-5 w-5" />,
         skills: [
             {
                 name: 'MySQL',
@@ -88,7 +88,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
             {
                 name: 'Eloquent ORM',
                 description:
-                    'Models, relationships and application data access.',
+                    'Models, relationships, and application data access.',
             },
             {
                 name: 'Data Modelling',
@@ -101,22 +101,22 @@ const SKILL_CATEGORIES: SkillCategory[] = [
         number: '04',
         title: 'Development',
         subtitle: 'Workflow & tooling',
-        icon: <GitBranch className="h-6 w-6" />,
+        icon: <GitBranch className="h-5 w-5" />,
         skills: [
             {
                 name: 'Git',
                 description:
-                    'Version control, branching and collaborative development.',
+                    'Version control, branching, and collaborative development.',
             },
             {
                 name: 'Inertia.js',
                 description:
-                    'Connecting Laravel applications with React interfaces.',
+                    'Connecting Laravel applications with React interfaces seamlessly.',
             },
             {
                 name: 'Vite',
                 description:
-                    'Modern frontend tooling and development workflow.',
+                    'Modern frontend tooling and fast development workflow.',
             },
         ],
     },
@@ -129,9 +129,7 @@ function useInView() {
     useEffect(() => {
         const element = ref.current;
 
-        if (!element) {
-            return;
-        }
+        if (!element) return;
 
         const observer = new IntersectionObserver(
             ([entry]) => {
@@ -140,9 +138,7 @@ function useInView() {
                     observer.unobserve(element);
                 }
             },
-            {
-                threshold: 0.12,
-            },
+            { threshold: 0.12 },
         );
 
         observer.observe(element);
@@ -167,64 +163,55 @@ function SkillCard({
     return (
         <div
             className={`
-                group relative overflow-hidden
-                border-b border-r border-slate-300/80 dark:border-slate-700/60
-                p-7 md:p-9 lg:p-10
-                transition-all duration-700 ease-out
-                hover:bg-slate-900/[0.02] dark:hover:bg-white/[0.025]
+                group relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white/60 p-7 shadow-sm backdrop-blur-md transition-all duration-700 md:p-9 dark:border-slate-800/80 dark:bg-slate-900/40 hover:-translate-y-1 hover:border-slate-300 hover:bg-white hover:shadow-md dark:hover:border-slate-700 dark:hover:bg-slate-900/80
                 ${
                 visible
                     ? 'translate-y-0 opacity-100'
-                    : 'translate-y-16 opacity-0'
+                    : 'translate-y-12 opacity-0'
             }
             `}
             style={{
-                transitionDelay: `${200 + index * 140}ms`,
+                transitionDelay: `${150 + index * 120}ms`,
             }}
         >
-            <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full border border-slate-300/50 transition-all duration-700 group-hover:scale-125 group-hover:border-slate-400/60 dark:border-slate-700/40 dark:group-hover:border-slate-500/40" />
-
-            <div className="relative z-10">
-                <div className="mb-10 flex items-start justify-between">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 group-hover:border-slate-900 group-hover:bg-[#22242f] group-hover:text-white dark:border-slate-600 dark:bg-transparent dark:text-slate-300 dark:shadow-none dark:group-hover:border-white dark:group-hover:bg-white dark:group-hover:text-[#22242f]">
+            <div>
+                {/* Header Section */}
+                <div className="mb-8 flex items-center justify-between">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors duration-300 group-hover:bg-blue-50 group-hover:text-blue-600 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-blue-950/50 dark:group-hover:text-blue-400">
                         {category.icon}
                     </div>
 
-                    <span className="font-mono text-[12px] tracking-[0.3em] text-slate-400 dark:text-slate-600">
+                    <span className="font-mono text-xs font-semibold tracking-widest text-slate-400 dark:text-slate-500">
                         {category.number}
                     </span>
                 </div>
 
-                <p className="mb-2 text-[12px] uppercase tracking-[0.25em] text-slate-500">
+                <span className="block text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                     {category.subtitle}
-                </p>
+                </span>
 
-                <h3 className="font-serif text-[34px] tracking-[-0.03em] text-[#22242f] md:text-[40px] dark:text-white">
+                <h3 className="mt-1 font-sans text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                     {category.title}
                 </h3>
 
-                <div className="mt-8 space-y-6">
+                {/* Skills List */}
+                <div className="mt-8 space-y-5">
                     {category.skills.map((skill, skillIndex) => (
-                        <div
-                            key={skill.name}
-                            className="group/skill"
-                        >
-                            <div className="flex items-center gap-3">
-                                <span className="h-1.5 w-1.5 rounded-full bg-slate-400 transition-all duration-300 group-hover/skill:scale-150 group-hover/skill:bg-slate-900 dark:bg-slate-500 dark:group-hover/skill:bg-white" />
-
-                                <h4 className="text-[16px] font-medium text-slate-800 dark:text-slate-200">
+                        <div key={skill.name} className="group/skill">
+                            <div className="flex items-center gap-2.5">
+                                <span className="h-1.5 w-1.5 rounded-full bg-blue-600 transition-all duration-300 group-hover/skill:scale-125 dark:bg-blue-400" />
+                                <h4 className="text-sm font-semibold text-slate-800 transition-colors group-hover/skill:text-blue-600 dark:text-slate-200 dark:group-hover/skill:text-blue-400">
                                     {skill.name}
                                 </h4>
                             </div>
 
-                            <p className="ml-[18px] mt-2 max-w-[320px] text-[14px] leading-relaxed text-slate-600 dark:text-slate-400">
+                            <p className="ml-4 mt-1 text-xs font-normal leading-relaxed text-slate-600 dark:text-slate-400">
                                 {skill.description}
                             </p>
 
-                            {skillIndex !==
-                                category.skills.length - 1 && (
-                                    <div className="ml-[18px] mt-6 h-px bg-slate-200 dark:bg-slate-700/40" />
-                                )}
+                            {skillIndex !== category.skills.length - 1 && (
+                                <div className="mt-5 h-px bg-slate-100 dark:bg-slate-800/60" />
+                            )}
                         </div>
                     ))}
                 </div>
@@ -233,80 +220,61 @@ function SkillCard({
     );
 }
 
-function FloatingBackground() {
-    return (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -left-[420px] top-[80px] h-[850px] w-[850px] rounded-full border border-slate-300/40 motion-safe:animate-[skillOrbit_24s_linear_infinite] dark:border-slate-600/15" />
-
-            <div className="absolute -left-[300px] top-[200px] h-[600px] w-[600px] rounded-full border border-slate-300/50 motion-safe:animate-[skillOrbitReverse_30s_linear_infinite] dark:border-slate-600/20" />
-
-            <div className="absolute right-[8%] top-[15%] h-32 w-32 rounded-full bg-amber-500/[0.03] blur-2xl motion-safe:animate-[skillFloat_8s_ease-in-out_infinite] dark:bg-white/[0.015]" />
-
-            <div className="absolute bottom-[10%] left-[45%] h-48 w-48 rounded-full bg-slate-500/[0.03] blur-3xl motion-safe:animate-[skillFloat_11s_ease-in-out_infinite_reverse] dark:bg-slate-300/[0.02]" />
-        </div>
-    );
-}
-
 export default function Skills() {
     const [sectionRef, inView] = useInView();
 
     return (
-        <>
-            <section
-                ref={sectionRef}
-                id="skills"
-                className="relative w-full overflow-hidden bg-[#f4f2ed] text-[#22242f] transition-colors duration-500 dark:bg-[#22242f] dark:text-white lg:py-24"
-            >
-                <FloatingBackground />
+        <section
+            ref={sectionRef}
+            id="skills"
+            className="relative w-full overflow-hidden bg-[#f8f9fa] py-28 text-[#1a1a1a] transition-colors duration-500 dark:bg-[#0d0f17] dark:text-white"
+        >
+            {/* Ambient background glow */}
+            <div className="pointer-events-none absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px] dark:bg-indigo-500/15" />
+            <div className="pointer-events-none absolute -left-40 bottom-10 h-96 w-96 rounded-full bg-teal-500/10 blur-[120px] dark:bg-emerald-500/10" />
 
-                <div className="relative z-10 mx-auto w-full max-w-[1500px] px-6 md:px-10 lg:px-14 xl:px-16">
-                    <div className="mb-16 flex items-center gap-5 md:mb-20">
-                        <span className="text-[13px] font-medium uppercase tracking-[0.35em] text-slate-500">
-                            02
-                        </span>
+            <div className="relative mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-12">
+                {/* Section Header Tag */}
+                <div className="mb-20 flex items-center gap-4">
+                    <span className="flex h-7 items-center rounded-full bg-slate-200/60 px-3 font-mono text-xs font-semibold uppercase tracking-widest text-slate-700 dark:bg-slate-800/80 dark:text-slate-300">
+                        02
+                    </span>
+                    <div className="h-px w-12 bg-slate-300 dark:bg-slate-700/80" />
+                    <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+                        Skills & Expertise
+                    </span>
+                </div>
 
-                        <div className="h-px w-16 bg-slate-300 dark:bg-slate-700" />
-
-                        <span className="text-[13px] font-medium uppercase tracking-[0.35em] text-slate-600 dark:text-slate-400">
-                            Skills & Expertise
-                        </span>
+                {/* Section Title & Description */}
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
+                    <div className="lg:col-span-7">
+                        <h2 className="font-sans text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
+                            Tools I use to turn{' '}
+                            <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-300">
+                                ideas into software.
+                            </span>
+                        </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-                        <div className="lg:col-span-7">
-                            <h2 className="max-w-[850px] font-serif text-[52px] leading-[1.02] tracking-[-0.04em] text-[#22242f] sm:text-[64px] lg:text-[78px] dark:text-[#f7f7f8]">
-                                Tools I use to turn
-                                <span className="block text-slate-500 dark:text-slate-400">
-                                    ideas into software.
-                                </span>
-                            </h2>
-                        </div>
-
-                        <div className="flex items-end lg:col-span-5">
-                            <p className="max-w-[500px] text-[17px] font-light leading-[1.8] text-slate-600 md:text-[19px] dark:text-slate-400">
-                                I work across the full development
-                                cycle, from backend architecture and
-                                database design to responsive React
-                                interfaces and production-ready web
-                                applications.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="mt-20 grid grid-cols-1 border-l border-t border-slate-300/80 md:grid-cols-2 dark:border-slate-700/60">
-                        {SKILL_CATEGORIES.map(
-                            (category, index) => (
-                                <SkillCard
-                                    key={category.title}
-                                    category={category}
-                                    index={index}
-                                    visible={inView}
-                                />
-                            ),
-                        )}
+                    <div className="flex items-end lg:col-span-5">
+                        <p className="max-w-md text-base font-normal leading-relaxed text-slate-600 dark:text-slate-400">
+                            I work across the full development cycle, from backend architecture and database design to responsive React interfaces and production-ready web applications.
+                        </p>
                     </div>
                 </div>
-            </section>
-        </>
+
+                {/* Skill Cards Grid */}
+                <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {SKILL_CATEGORIES.map((category, index) => (
+                        <SkillCard
+                            key={category.title}
+                            category={category}
+                            index={index}
+                            visible={inView}
+                        />
+                    ))}
+                </div>
+            </div>
+        </section>
     );
 }
