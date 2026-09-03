@@ -13,26 +13,27 @@ import {
     useRef,
     useState,
 } from 'react';
+import { SkillCategory as SkillCategoryType } from '@/types';
 
-interface Skill {
+interface FallbackSkill {
     name: string;
-    description: string;
+    description?: string;
 }
 
-interface SkillCategory {
+interface FallbackCategory {
     number: string;
     title: string;
-    subtitle: string;
-    icon: ReactNode;
-    skills: Skill[];
+    subtitle?: string;
+    icon?: string | ReactNode;
+    skills?: FallbackSkill[];
 }
 
-const SKILL_CATEGORIES: SkillCategory[] = [
+const DEFAULT_CATEGORIES: FallbackCategory[] = [
     {
         number: '01',
         title: 'Backend',
         subtitle: 'Server & application logic',
-        icon: <Server className="h-5 w-5" />,
+        icon: 'Server',
         skills: [
             {
                 name: 'Laravel',
@@ -55,7 +56,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
         number: '02',
         title: 'Frontend',
         subtitle: 'Interfaces & interaction',
-        icon: <Code2 className="h-5 w-5" />,
+        icon: 'Code2',
         skills: [
             {
                 name: 'React',
@@ -78,7 +79,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
         number: '03',
         title: 'Database',
         subtitle: 'Data & relationships',
-        icon: <Database className="h-5 w-5" />,
+        icon: 'Database',
         skills: [
             {
                 name: 'MySQL',
@@ -99,28 +100,39 @@ const SKILL_CATEGORIES: SkillCategory[] = [
     },
     {
         number: '04',
-        title: 'Development',
-        subtitle: 'Workflow & tooling',
-        icon: <GitBranch className="h-5 w-5" />,
+        title: 'Workflow & Tools',
+        subtitle: 'Development practices',
+        icon: 'GitBranch',
         skills: [
             {
-                name: 'Git',
+                name: 'Git & GitHub',
                 description:
-                    'Version control, branching, and collaborative development.',
+                    'Version control, branching strategies, and collaboration.',
             },
             {
-                name: 'Inertia.js',
+                name: 'Vite & Build Tools',
                 description:
-                    'Connecting Laravel applications with React interfaces seamlessly.',
+                    'Modern asset bundling and development tooling.',
             },
             {
-                name: 'Vite',
+                name: 'Clean Architecture',
                 description:
-                    'Modern frontend tooling and fast development workflow.',
+                    'Readable, scalable, and maintainable code structure.',
             },
         ],
     },
 ];
+
+function getCategoryIcon(iconName?: string | ReactNode): ReactNode {
+    if (typeof iconName !== 'string') return iconName || <Code2 className="h-5 w-5" />;
+    const icon = iconName.toLowerCase();
+    if (icon.includes('server')) return <Server className="h-5 w-5" />;
+    if (icon.includes('code')) return <Code2 className="h-5 w-5" />;
+    if (icon.includes('database')) return <Database className="h-5 w-5" />;
+    if (icon.includes('git')) return <GitBranch className="h-5 w-5" />;
+    if (icon.includes('layer')) return <Layers3 className="h-5 w-5" />;
+    return <Sparkles className="h-5 w-5" />;
+}
 
 function useInView() {
     const ref = useRef<HTMLElement | null>(null);
@@ -152,14 +164,16 @@ function useInView() {
 }
 
 function SkillCard({
-                       category,
-                       index,
-                       visible,
-                   }: {
-    category: SkillCategory;
+    category,
+    index,
+    visible,
+}: {
+    category: SkillCategoryType | FallbackCategory;
     index: number;
     visible: boolean;
 }) {
+    const icon = getCategoryIcon(category.icon);
+
     return (
         <div
             className={`
@@ -178,7 +192,7 @@ function SkillCard({
                 {/* Header Section */}
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors duration-300 group-hover:bg-blue-50 group-hover:text-blue-600 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-blue-950/50 dark:group-hover:text-blue-400">
-                        {category.icon}
+                        {icon}
                     </div>
 
                     <span className="font-mono text-xs font-semibold tracking-widest text-slate-400 dark:text-slate-500">
@@ -186,9 +200,11 @@ function SkillCard({
                     </span>
                 </div>
 
-                <span className="block text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                    {category.subtitle}
-                </span>
+                {category.subtitle && (
+                    <span className="block text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                        {category.subtitle}
+                    </span>
+                )}
 
                 <h3 className="mt-1 font-sans text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                     {category.title}
@@ -196,7 +212,7 @@ function SkillCard({
 
                 {/* Skills List */}
                 <div className="mt-8 space-y-5">
-                    {category.skills.map((skill, skillIndex) => (
+                    {category.skills?.map((skill, skillIndex) => (
                         <div key={skill.name} className="group/skill">
                             <div className="flex items-center gap-2.5">
                                 <span className="h-1.5 w-1.5 rounded-full bg-blue-600 transition-all duration-300 group-hover/skill:scale-125 dark:bg-blue-400" />
@@ -205,11 +221,13 @@ function SkillCard({
                                 </h4>
                             </div>
 
-                            <p className="ml-4 mt-1 text-xs font-normal leading-relaxed text-slate-600 dark:text-slate-400">
-                                {skill.description}
-                            </p>
+                            {skill.description && (
+                                <p className="ml-4 mt-1 text-xs font-normal leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {skill.description}
+                                </p>
+                            )}
 
-                            {skillIndex !== category.skills.length - 1 && (
+                            {skillIndex !== (category.skills?.length || 0) - 1 && (
                                 <div className="mt-5 h-px bg-slate-100 dark:bg-slate-800/60" />
                             )}
                         </div>
@@ -220,8 +238,9 @@ function SkillCard({
     );
 }
 
-export default function Skills() {
+export default function Skills({ categories }: { categories?: SkillCategoryType[] }) {
     const [sectionRef, inView] = useInView();
+    const displayCategories = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
 
     return (
         <section
@@ -265,7 +284,7 @@ export default function Skills() {
 
                 {/* Skill Cards Grid */}
                 <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {SKILL_CATEGORIES.map((category, index) => (
+                    {displayCategories.map((category, index) => (
                         <SkillCard
                             key={category.title}
                             category={category}

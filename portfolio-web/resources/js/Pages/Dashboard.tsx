@@ -1,26 +1,19 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { router } from '@inertiajs/react';
 
 export default function Dashboard() {
-    return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
-            <Head title="Dashboard" />
+    useEffect(() => {
+        router.visit(route('admin.dashboard'));
+    }, []);
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            You're logged in!
-                        </div>
-                    </div>
-                </div>
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <div className="flex items-center gap-3">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Loading Admin Dashboard...
+                </span>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }

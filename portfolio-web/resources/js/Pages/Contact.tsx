@@ -1,20 +1,49 @@
-import { Head } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowUpRight,
     Mail,
     MapPin,
     MessageSquare,
     Send,
+    CheckCircle2,
 } from 'lucide-react';
-
 import PortfolioLayout from '@/Layouts/PortfolioLayout';
+import { ProfileSetting, PageProps } from '@/types';
 
-export default function Contact() {
-    return (
+export default function Contact({ profile }: { profile?: ProfileSetting }) {
+    const page = usePage<PageProps>();
+    const isStandalonePage = page.component === 'Contact';
+    const flashSuccess = page.props.flash?.success;
+
+    const email = profile?.email || 'hello@saharsha.dev';
+    const location = profile?.location || 'Nepal · Available Remote';
+    const availabilityStatus = profile?.availability_status || 'Available for new opportunities';
+
+    const { data, setData, post, processing, errors, reset, recentlySuccessful } = useForm({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+    });
+
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+        post(route('contact.store'), {
+            preserveScroll: true,
+            onSuccess: () => reset(),
+        });
+    };
+
+    const content = (
         <section
             id="contact"
-            className="relative w-full overflow-hidden bg-[#f8f9fa] py-28 text-[#1a1a1a] transition-colors duration-500 dark:bg-[#0d0f17] dark:text-white"
+            className={`relative w-full overflow-hidden bg-[#f8f9fa] text-[#1a1a1a] transition-colors duration-500 dark:bg-[#0d0f17] dark:text-white ${
+                isStandalonePage ? 'pt-32 pb-28' : 'py-28'
+            }`}
         >
+            {isStandalonePage && <Head title="Contact — Saharsha Bhatta" />}
+
             {/* Ambient background glow & radial patterns */}
             <div className="pointer-events-none absolute -right-40 bottom-10 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px] dark:bg-indigo-500/15" />
             <div className="pointer-events-none absolute -left-40 top-1/4 h-96 w-96 rounded-full bg-teal-500/10 blur-[120px] dark:bg-emerald-500/10" />
@@ -50,7 +79,7 @@ export default function Contact() {
                             {/* Contact Quick Info Cards */}
                             <div className="space-y-4 pt-2">
                                 <a
-                                    href="mailto:hello@saharsha.dev"
+                                    href={`mailto:${email}`}
                                     className="group flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700 dark:hover:bg-slate-900/80"
                                 >
                                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-blue-950/50 dark:group-hover:text-blue-400">
@@ -61,7 +90,7 @@ export default function Contact() {
                                             Email Direct
                                         </span>
                                         <span className="mt-0.5 block text-sm font-semibold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-                                            hello@saharsha.dev
+                                            {email}
                                         </span>
                                     </div>
                                 </a>
@@ -75,7 +104,7 @@ export default function Contact() {
                                             Location & Work Mode
                                         </span>
                                         <span className="mt-0.5 block text-sm font-semibold text-slate-900 dark:text-white">
-                                            Nepal · Available Remote
+                                            {location}
                                         </span>
                                     </div>
                                 </div>
@@ -122,10 +151,17 @@ export default function Contact() {
                                 </div>
                             </div>
 
-                            <form
-                                className="space-y-6"
-                                onSubmit={(event) => event.preventDefault()}
-                            >
+                            {/* Success Notification Alert */}
+                            {(flashSuccess || recentlySuccessful) && (
+                                <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-200 animate-in fade-in slide-in-from-top-2">
+                                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                    <p className="text-sm font-medium">
+                                        {flashSuccess || 'Thank you! Your message has been sent successfully. I will get back to you soon.'}
+                                    </p>
+                                </div>
+                            )}
+
+                            <form className="space-y-6" onSubmit={submit}>
                                 <div className="grid gap-6 md:grid-cols-2">
                                     <label className="grid gap-2">
                                         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -134,9 +170,15 @@ export default function Contact() {
                                         <input
                                             type="text"
                                             name="name"
+                                            value={data.name}
+                                            onChange={(e) => setData('name', e.target.value)}
                                             placeholder="Jane Doe"
                                             className="rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 dark:border-slate-800 dark:bg-slate-900/60 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/10"
+                                            required
                                         />
+                                        {errors.name && (
+                                            <span className="text-xs text-rose-500">{errors.name}</span>
+                                        )}
                                     </label>
 
                                     <label className="grid gap-2">
@@ -146,11 +188,31 @@ export default function Contact() {
                                         <input
                                             type="email"
                                             name="email"
+                                            value={data.email}
+                                            onChange={(e) => setData('email', e.target.value)}
                                             placeholder="jane@example.com"
                                             className="rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 dark:border-slate-800 dark:bg-slate-900/60 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/10"
+                                            required
                                         />
+                                        {errors.email && (
+                                            <span className="text-xs text-rose-500">{errors.email}</span>
+                                        )}
                                     </label>
                                 </div>
+
+                                <label className="grid gap-2">
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                        Subject (Optional)
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="subject"
+                                        value={data.subject}
+                                        onChange={(e) => setData('subject', e.target.value)}
+                                        placeholder="Project Inquiry / Collaboration"
+                                        className="rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 dark:border-slate-800 dark:bg-slate-900/60 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/10"
+                                    />
+                                </label>
 
                                 <label className="grid gap-2 pt-2">
                                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -159,17 +221,24 @@ export default function Contact() {
                                     <textarea
                                         name="message"
                                         rows={5}
+                                        value={data.message}
+                                        onChange={(e) => setData('message', e.target.value)}
                                         placeholder="Tell me a little about what you have in mind..."
                                         className="resize-none rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 dark:border-slate-800 dark:bg-slate-900/60 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/10"
+                                        required
                                     />
+                                    {errors.message && (
+                                        <span className="text-xs text-rose-500">{errors.message}</span>
+                                    )}
                                 </label>
 
                                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-4">
                                     <button
                                         type="submit"
-                                        className="group inline-flex h-12 items-center gap-3 rounded-xl bg-slate-900 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-md dark:bg-white dark:text-slate-900 dark:hover:bg-blue-500 dark:hover:text-white"
+                                        disabled={processing}
+                                        className="group inline-flex h-12 items-center gap-3 rounded-xl bg-slate-900 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-md disabled:opacity-50 dark:bg-white dark:text-slate-900 dark:hover:bg-blue-500 dark:hover:text-white"
                                     >
-                                        <span>Send Message</span>
+                                        <span>{processing ? 'Sending...' : 'Send Message'}</span>
                                         <Send className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                                     </button>
 
@@ -184,4 +253,10 @@ export default function Contact() {
             </div>
         </section>
     );
+
+    if (isStandalonePage) {
+        return <PortfolioLayout>{content}</PortfolioLayout>;
+    }
+
+    return content;
 }

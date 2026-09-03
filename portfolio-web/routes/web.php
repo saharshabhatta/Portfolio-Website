@@ -1,47 +1,79 @@
 <?php
 
+use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\ContactMessageController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExperienceController;
+use App\Http\Controllers\Admin\ProfileSettingController;
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\SkillCategoryController;
+use App\Http\Controllers\Admin\SkillController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\PublicCertificateController;
+use App\Http\Controllers\PublicExperienceController;
+use App\Http\Controllers\PublicProjectController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-//Route::get('/', function () {
-//    return Inertia::render('Welcome', [
-//        'canLogin' => Route::has('login'),
-//        'canRegister' => Route::has('register'),
-//        'laravelVersion' => Application::VERSION,
-//        'phpVersion' => PHP_VERSION,
-//    ]);
-//});
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/', HomeController::class)->name('home');
+Route::get('/projects', PublicProjectController::class)->name('projects');
+Route::get('/experience', PublicExperienceController::class)->name('experience');
+Route::get('/certificates', PublicCertificateController::class)->name('certificates');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-Route::get('/', function () {
-    return Inertia::render('Home');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| Admin & Dashboard Protected Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Alias /dashboard directly to Admin Dashboard
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-Route::get('/projects', function () {
-    return Inertia::render('Projects');
-})->name('projects');
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', DashboardController::class)->name('index');
+        Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-Route::get('/experience', function () {
-    return Inertia::render('Experience');
-})->name('experience');
+        // Profile & Site Settings
+        Route::get('/profile', [ProfileSettingController::class, 'index'])->name('profile.index');
+        Route::post('/profile', [ProfileSettingController::class, 'update'])->name('profile.update');
 
-Route::get('/certificates', function () {
-    return Inertia::render('Certificates');
-})->name('certificates');
+        // Projects Resource
+        Route::resource('projects', ProjectController::class);
 
-Route::get('/contact', function () {
-    return Inertia::render('Contact');
-})->name('contact');
+        // Experience Resource
+        Route::resource('experience', ExperienceController::class);
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+        // Certificates Resource
+        Route::resource('certificates', CertificateController::class);
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        // Skills & Categories
+        Route::get('/skills', [SkillCategoryController::class, 'index'])->name('skills.index');
+        Route::post('/skill-categories', [SkillCategoryController::class, 'store'])->name('skill-categories.store');
+        Route::put('/skill-categories/{category}', [SkillCategoryController::class, 'update'])->name('skill-categories.update');
+        Route::delete('/skill-categories/{category}', [SkillCategoryController::class, 'destroy'])->name('skill-categories.destroy');
+
+        Route::post('/skills', [SkillController::class, 'store'])->name('skills.store');
+        Route::put('/skills/{skill}', [SkillController::class, 'update'])->name('skills.update');
+        Route::delete('/skills/{skill}', [SkillController::class, 'destroy'])->name('skills.destroy');
+
+        // Messages Inbox
+        Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
+        Route::patch('/messages/{message}/toggle-read', [ContactMessageController::class, 'toggleRead'])->name('messages.toggle-read');
+        Route::delete('/messages/{message}', [ContactMessageController::class, 'destroy'])->name('messages.destroy');
+    });
+
+    // Breeze user account settings
+    Route::get('/user/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/user/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/user/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

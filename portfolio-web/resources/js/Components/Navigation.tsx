@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowUpRight, Menu, X, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { PageProps } from '@/types';
 
 const NAV_ITEMS = [
     { label: 'Home', href: '/' },
@@ -11,9 +12,15 @@ const NAV_ITEMS = [
 ];
 
 export default function Navigation() {
-    const { url } = usePage();
+    const { url, props } = usePage<PageProps>();
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+
+    const siteProfile = props.siteProfile;
+    const authUser = props.auth?.user;
+    const isAvailable = siteProfile?.is_available_for_hire ?? true;
+    const nameInitial = siteProfile?.title_prefix?.charAt(0) || 'S';
+    const brandName = siteProfile?.title_prefix || 'Saharsha';
 
     useEffect(() => {
         const handleScroll = () => {
@@ -50,17 +57,19 @@ export default function Navigation() {
                 >
                     <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-md transition-all duration-300 group-hover:scale-105 group-hover:bg-blue-600 dark:bg-white dark:text-slate-900 dark:group-hover:bg-blue-400">
                         <span className="font-mono text-lg font-bold tracking-tighter">
-                            S
+                            {nameInitial}
                         </span>
-                        <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                        </span>
+                        {isAvailable && (
+                            <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex flex-col">
                         <span className="font-sans text-xl font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-                            Saharsha
+                            {brandName}
                         </span>
                         <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                             Developer
@@ -92,8 +101,18 @@ export default function Navigation() {
                     </ul>
                 </div>
 
-                {/* Desktop Action CTA Button */}
-                <div className="hidden items-center gap-4 lg:flex">
+                {/* Desktop Action CTA & Admin Buttons */}
+                <div className="hidden items-center gap-3 lg:flex">
+                    {authUser && (
+                        <Link
+                            href="/admin/dashboard"
+                            className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-2.5 text-xs font-semibold text-blue-700 shadow-sm transition-all hover:bg-blue-100 dark:border-blue-900/60 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                        >
+                            <LayoutDashboard className="h-3.5 w-3.5" />
+                            <span>Admin CMS</span>
+                        </Link>
+                    )}
+
                     <Link
                         href="/contact"
                         className="group inline-flex items-center gap-2.5 rounded-full bg-slate-900 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-sm transition-all duration-300 hover:bg-blue-600 hover:shadow-md dark:bg-white dark:text-slate-900 dark:hover:bg-blue-400 dark:hover:text-slate-950"
@@ -118,7 +137,7 @@ export default function Navigation() {
             <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out lg:hidden ${
                     isOpen
-                        ? 'max-h-[500px] border-b border-slate-200/80 bg-white/95 opacity-100 backdrop-blur-2xl shadow-lg dark:border-slate-800/80 dark:bg-[#0d0f17]/95'
+                        ? 'max-h-[550px] border-b border-slate-200/80 bg-white/95 opacity-100 backdrop-blur-2xl shadow-lg dark:border-slate-800/80 dark:bg-[#0d0f17]/95'
                         : 'pointer-events-none max-h-0 opacity-0'
                 }`}
             >
@@ -144,6 +163,20 @@ export default function Navigation() {
                             </Link>
                         );
                     })}
+
+                    {authUser && (
+                        <Link
+                            href="/admin/dashboard"
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center justify-between rounded-2xl bg-blue-50 px-5 py-3.5 text-sm font-semibold text-blue-700 dark:bg-blue-950/50 dark:text-blue-300"
+                        >
+                            <div className="flex items-center gap-2">
+                                <LayoutDashboard className="h-4 w-4" />
+                                <span>Admin Panel</span>
+                            </div>
+                            <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                    )}
 
                     <div className="pt-2">
                         <Link

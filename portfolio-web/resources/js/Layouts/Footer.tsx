@@ -1,9 +1,16 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     ArrowUp,
     ArrowUpRight,
     MapPin,
+    Globe,
 } from 'lucide-react';
+import { PageProps } from '@/types';
+import { FacebookIcon } from '@/Components/svg/FacebookIcon';
+import { DribbbleIcon } from '@/Components/svg/DribbbleIcon';
+import { LinkedinIcon } from '@/Components/svg/LinkedinIcon';
+import { GithubIcon } from '@/Components/svg/GithubIcon';
+import { InstagramIcon } from '@/Components/svg/InstagramIcon';
 
 const QUICK_LINKS = [
     { label: 'Home', href: '/' },
@@ -13,45 +20,34 @@ const QUICK_LINKS = [
     { label: 'Contact', href: '/contact' },
 ];
 
-const SOCIAL_LINKS = [
-    {
-        name: 'GitHub',
-        href: 'https://github.com',
-        handle: '@saharsha',
-        icon: (props: React.SVGProps<SVGSVGElement>) => (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-                <path d="M9 18c-4.51 2-5-2-7-2" />
-            </svg>
-        ),
-    },
-    {
-        name: 'LinkedIn',
-        href: 'https://linkedin.com',
-        handle: 'Saharsha Bhatta',
-        icon: (props: React.SVGProps<SVGSVGElement>) => (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                <rect width="4" height="12" x="2" y="9" />
-                <circle cx="4" cy="4" r="2" />
-            </svg>
-        ),
-    },
-    {
-        name: 'Instagram',
-        href: 'https://instagram.com',
-        handle: '@saharsha',
-        icon: (props: React.SVGProps<SVGSVGElement>) => (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-            </svg>
-        ),
-    },
-];
+function getSocialIcon(platform: string) {
+    const p = platform.toLowerCase();
+    if (p.includes('facebook')) return FacebookIcon;
+    if (p.includes('dribbble')) return DribbbleIcon;
+    if (p.includes('linkedin')) return LinkedinIcon;
+    if (p.includes('github')) return GithubIcon;
+    if (p.includes('instagram')) return InstagramIcon;
+    return Globe;
+}
 
 export default function Footer() {
+    const { props } = usePage<PageProps>();
+    const siteProfile = props.siteProfile;
+
+    const fullName = siteProfile?.full_name || 'Saharsha Bhatta';
+    const headline = siteProfile?.headline || 'Full-Stack Software Developer focused on crafting performant web platforms, modern interfaces, and scalable applications.';
+    const location = siteProfile?.location || 'Nepal · Available Remote';
+    const isAvailable = siteProfile?.is_available_for_hire ?? true;
+    const availabilityText = siteProfile?.availability_status || 'Available for new opportunities';
+
+    const socialLinks = siteProfile?.social_links && siteProfile.social_links.length > 0
+        ? siteProfile.social_links
+        : [
+            { platform: 'GitHub', url: 'https://github.com', handle: '@saharsha' },
+            { platform: 'LinkedIn', url: 'https://linkedin.com', handle: 'Saharsha Bhatta' },
+            { platform: 'Instagram', url: 'https://instagram.com', handle: '@saharsha' },
+        ];
+
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -68,9 +64,11 @@ export default function Footer() {
                     <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
                         <div className="lg:col-span-8">
                             <div className="flex items-center gap-3">
-                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                {isAvailable && (
+                                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                )}
                                 <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                                    Available for new opportunities
+                                    {availabilityText}
                                 </span>
                             </div>
 
@@ -100,20 +98,20 @@ export default function Footer() {
                     <div className="space-y-4 md:col-span-5">
                         <Link href="/" className="group flex items-center gap-3">
                             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:bg-blue-600 dark:bg-white dark:text-slate-900 dark:group-hover:bg-blue-400">
-                                <span className="font-mono text-lg font-bold">S</span>
+                                <span className="font-mono text-lg font-bold">{fullName.charAt(0)}</span>
                             </div>
                             <span className="font-sans text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                Saharsha Bhatta
+                                {fullName}
                             </span>
                         </Link>
 
                         <p className="max-w-sm font-sans text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                            Full-Stack Software Developer focused on crafting performant web platforms, modern interfaces, and scalable applications.
+                            {headline}
                         </p>
 
                         <div className="flex items-center gap-2 pt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
                             <MapPin className="h-4 w-4 text-slate-400" />
-                            <span>Kathmandu, Nepal</span>
+                            <span>{location}</span>
                         </div>
                     </div>
 
@@ -143,20 +141,20 @@ export default function Footer() {
                         </h3>
 
                         <div className="mt-4 flex flex-col gap-3">
-                            {SOCIAL_LINKS.map((social) => {
-                                const Icon = social.icon;
+                            {socialLinks.map((social) => {
+                                const Icon = getSocialIcon(social.platform);
 
                                 return (
                                     <a
-                                        key={social.name}
-                                        href={social.href}
+                                        key={social.platform + social.url}
+                                        href={social.url}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="group flex items-center justify-between rounded-xl border border-slate-200/80 bg-white/50 px-4 py-3 text-xs font-semibold backdrop-blur-md transition-all duration-300 hover:border-slate-300 hover:bg-white dark:border-slate-800/80 dark:bg-slate-900/30 dark:hover:border-slate-700 dark:hover:bg-slate-900/70"
                                     >
                                         <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                                             <Icon className="h-4 w-4 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                                            <span>{social.name}</span>
+                                            <span>{social.platform}</span>
                                         </div>
                                         <div className="flex items-center gap-1 font-mono text-slate-400">
                                             <span>{social.handle}</span>
@@ -172,7 +170,7 @@ export default function Footer() {
                 {/* Bottom Bar & Copyright */}
                 <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-slate-200/80 pt-8 sm:flex-row dark:border-slate-800/80">
                     <div className="flex items-center gap-2 font-mono text-xs text-slate-500 dark:text-slate-400">
-                        <span>© {new Date().getFullYear()} Saharsha Bhatta. All rights reserved.</span>
+                        <span>© {new Date().getFullYear()} {fullName}. All rights reserved.</span>
                     </div>
 
                     <button
